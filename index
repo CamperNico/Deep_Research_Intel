@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Deep Research Hub</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+</head>
+<body style="font-family: sans-serif; margin: 2rem;">
+  <h1>Deep Research Hub</h1>
+  <p>Select a research brief:</p>
+
+  <select id="docSelect">
+    <!-- populated from manifest.json -->
+  </select>
+  <button onclick="go()">GO</button>
+
+  <script>
+    async function loadManifest() {
+      const res = await fetch("manifest.json");
+      const manifest = await res.json();
+      const select = document.getElementById("docSelect");
+      manifest.forEach(item => {
+        const opt = document.createElement("option");
+        opt.value = item.id;
+        opt.textContent = item.title;
+        select.appendChild(opt);
+      });
+    }
+
+    function go() {
+      const id = document.getElementById("docSelect").value;
+      window.location.href = `viewer.html?doc=${id}`;
+    }
+
+    loadManifest();
+  </script>
+</body>
+</html>
