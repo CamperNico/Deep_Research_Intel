@@ -4,33 +4,77 @@
   <meta charset="utf-8" />
   <title>Deep Research Hub</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="styles.css" />
+  <meta name="color-scheme" content="dark light">
 </head>
-<body style="font-family: sans-serif; margin: 2rem;">
-  <h1>Deep Research Hub</h1>
-  <p>Select a research brief:</p>
+<body>
+  <header>
+    <div class="header-inner container">
+      <div class="brand">
+        <span class="dot" aria-hidden="true"></span>
+        Deep Research Hub
+      </div>
+      <div class="tagline">signal over noise • investor-grade intel</div>
+    </div>
+  </header>
 
-  <select id="docSelect">
-    <!-- populated from manifest.json -->
-  </select>
-  <button onclick="go()">GO</button>
+  <main class="container">
+    <section class="panel" aria-labelledby="pick-doc">
+      <h2 id="pick-doc" style="margin:0 0 10px;font-size:16px;color:var(--muted);font-weight:600;">Select a research brief</h2>
+      <div class="row">
+        <label for="docSelect">Brief</label>
+        <select id="docSelect" aria-label="Select a research brief"></select>
+        <button class="primary" id="goBtn">GO</button>
+        <button class="ghost" id="openNew">Open in new tab</button>
+      </div>
+      <div class="meta">
+        Tip: use <kbd>Enter</kbd> to open; <kbd>Alt</kbd> + <kbd>↓</kbd> to expand the menu.
+      </div>
+    </section>
+
+    <section style="margin-top:16px;color:var(--muted);font-size:13px">
+      <span id="count"></span>
+    </section>
+  </main>
 
   <script>
     async function loadManifest() {
-      const res = await fetch("manifest.json");
-      const manifest = await res.json();
-      const select = document.getElementById("docSelect");
-      manifest.forEach(item => {
-        const opt = document.createElement("option");
-        opt.value = item.id;
-        opt.textContent = item.title;
-        select.appendChild(opt);
-      });
+      try{
+        const res = await fetch("manifest.json", { cache: "no-store" });
+        const manifest = await res.json();
+        const select = document.getElementById("docSelect");
+        const count = document.getElementById("count");
+
+        // sort newest first if entries contain a date in the title or id
+        manifest.sort((a,b)=> (b.id||"").localeCompare(a.id||""));
+
+        manifest.forEach(item => {
+          const opt = document.createElement("option");
+          opt.value = item.id;
+          opt.textContent = item.title;
+          select.appendChild(opt);
+        });
+
+        count.textContent = `${manifest.length} brief${manifest.length===1?"":"s"} available`;
+      } catch(e){
+        console.error(e);
+        alert("Couldn't load manifest.json");
+      }
     }
 
-    function go() {
+    function go(newTab=false){
       const id = document.getElementById("docSelect").value;
-      window.location.href = `viewer.html?doc=${id}`;
+      const url = `viewer.html?doc=${encodeURIComponent(id)}`;
+      if(newTab) window.open(url, "_blank");
+      else window.location.href = url;
     }
+
+    // events
+    document.getElementById("goBtn").addEventListener("click", ()=>go(false));
+    document.getElementById("openNew").addEventListener("click", ()=>go(true));
+    document.addEventListener("keydown", (e)=>{
+      if(e.key==="Enter" && document.activeElement.id!=="docSelect") { go(false); }
+    });
 
     loadManifest();
   </script>
