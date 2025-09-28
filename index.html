@@ -4,78 +4,121 @@
   <meta charset="utf-8" />
   <title>Deep Research Hub</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="styles.css" />
   <meta name="color-scheme" content="dark light">
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <header>
     <div class="header-inner container">
-      <div class="brand">
-        <span class="dot" aria-hidden="true"></span>
-        Deep Research Hub
+      <div class="brand"><div class="logo" aria-hidden="true"></div> Deep Research Hub</div>
+      <div class="tagline">professional stock research • signal over noise</div>
+      <div class="header-actions">
+        <button class="toggle" id="copyHome">Copy URL</button>
       </div>
-      <div class="tagline">signal over noise • investor-grade intel</div>
     </div>
   </header>
 
   <main class="container">
     <section class="panel" aria-labelledby="pick-doc">
-      <h2 id="pick-doc" style="margin:0 0 10px;font-size:16px;color:var(--muted);font-weight:600;">Select a research brief</h2>
-      <div class="row">
+      <h2 id="pick-doc">Open a research brief</h2>
+      <div class="row" style="margin-top:8px">
         <label for="docSelect">Brief</label>
         <select id="docSelect" aria-label="Select a research brief"></select>
         <button class="primary" id="goBtn">GO</button>
         <button class="ghost" id="openNew">Open in new tab</button>
       </div>
+
+      <div class="chips" id="categoryChips" aria-label="Categories"></div>
       <div class="meta">
-        Tip: use <kbd>Enter</kbd> to open; <kbd>Alt</kbd> + <kbd>↓</kbd> to expand the menu.
+        Tip: <kbd>Enter</kbd> to open · <kbd>Alt</kbd>+<kbd>↓</kbd> to expand menu
       </div>
     </section>
 
     <section style="margin-top:16px;color:var(--muted);font-size:13px">
-      <span id="count"></span>
+      <span id="count"></span><span class="sep">•</span><span id="latest"></span>
     </section>
   </main>
 
+  <footer class="container">
+    <span>© <span id="year"></span> Deep Research Hub</span>
+    <span class="sep">•</span>
+    <span>Built for serious traders</span>
+  </footer>
+
   <script>
+    const fmt = (dStr)=>{
+      if(!dStr) return "";
+      const d = new Date(dStr);
+      if(isNaN(d)) return dStr;
+      return d.toLocaleDateString(undefined, {year:"numeric", month:"short", day:"2-digit"});
+    };
+
     async function loadManifest() {
-      try{
-        const res = await fetch("manifest.json", { cache: "no-store" });
-        const manifest = await res.json();
-        const select = document.getElementById("docSelect");
-        const count = document.getElementById("count");
+      const res = await fetch("manifest.json", { cache: "no-store" });
+      const manifest = await res.json();
 
-        // sort newest first if entries contain a date in the title or id
-        manifest.sort((a,b)=> (b.id||"").localeCompare(a.id||""));
+      // sort: prefer explicit date desc; else id desc
+      manifest.sort((a,b)=>{
+        if(a.date && b.date) return new Date(b.date) - new Date(a.date);
+        return (b.id||"").localeCompare(a.id||"");
+      });
 
-        manifest.forEach(item => {
-          const opt = document.createElement("option");
-          opt.value = item.id;
-          opt.textContent = item.title;
-          select.appendChild(opt);
+      // populate select
+      const select = document.getElementById("docSelect");
+      manifest.forEach(item => {
+        const opt = document.createElement("option");
+        opt.value = item.id;
+        opt.textContent = item.title;
+        select.appendChild(opt);
+      });
+
+      // category chips (dedup)
+      const chipWrap = document.getElementById("categoryChips");
+      const cats = [...new Set(manifest.map(x => x.category).filter(Boolean))];
+      cats.forEach(cat=>{
+        const b = document.createElement("button");
+        b.className = "chip";
+        b.textContent = "#" + cat;
+        b.addEventListener("click", ()=>{
+          // jump to the first doc in this category
+          const hit = manifest.find(m => m.category === cat);
+          if(hit){
+            select.value = hit.id;
+            select.scrollIntoView({behavior:"smooth", block:"center"});
+          }
         });
+        chipWrap.appendChild(b);
+      });
 
-        count.textContent = `${manifest.length} brief${manifest.length===1?"":"s"} available`;
-      } catch(e){
-        console.error(e);
-        alert("Couldn't load manifest.json");
-      }
+      // meta line
+      document.getElementById("count").textContent =
+        `${manifest.length} brief${manifest.length===1?"":"s"} available`;
+
+      const newest = manifest[0];
+      document.getElementById("latest").textContent =
+        newest ? `Latest: ${newest.title}${newest.date ? " — " + fmt(newest.date) : ""}` : "";
+
+      // events
+      document.getElementById("goBtn").addEventListener("click", ()=>go(false));
+      document.getElementById("openNew").addEventListener("click", ()=>go(true));
+      document.addEventListener("keydown", (e)=>{
+        if(e.key==="Enter" && document.activeElement.id!=="docSelect") { go(false); }
+      });
+
+      // copy home url
+      document.getElementById("copyHome").addEventListener("click", async ()=>{
+        try{ await navigator.clipboard.writeText(location.href); alert("URL copied"); }catch(e){ alert("Copy failed");}
+      });
     }
 
     function go(newTab=false){
       const id = document.getElementById("docSelect").value;
+      if(!id) return;
       const url = `viewer.html?doc=${encodeURIComponent(id)}`;
-      if(newTab) window.open(url, "_blank");
-      else window.location.href = url;
+      if(newTab) window.open(url, "_blank"); else window.location.href = url;
     }
 
-    // events
-    document.getElementById("goBtn").addEventListener("click", ()=>go(false));
-    document.getElementById("openNew").addEventListener("click", ()=>go(true));
-    document.addEventListener("keydown", (e)=>{
-      if(e.key==="Enter" && document.activeElement.id!=="docSelect") { go(false); }
-    });
-
+    document.getElementById("year").textContent = new Date().getFullYear();
     loadManifest();
   </script>
 </body>
