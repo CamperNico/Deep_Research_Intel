@@ -4,8 +4,8 @@
   <meta charset="utf-8" />
   <title>Research Viewer</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="styles.css" />
   <meta name="color-scheme" content="dark light">
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <div id="progress"></div>
@@ -14,57 +14,68 @@
     <div class="header-inner container">
       <a class="back" href="index.html">← Home</a>
       <div class="title" id="docTitle">Loading…</div>
-      <div class="tagline" id="docMeta"></div>
+      <div class="chips" id="docChips"></div>
+      <div class="actions">
+        <button class="action" id="copyLink">Copy Link</button>
+        <a class="action" id="openRaw" target="_blank" rel="noopener">Open Raw</a>
+      </div>
     </div>
   </header>
 
   <main class="container">
     <article class="article" id="content">Loading…</article>
-    <div class="source-note" id="sourceNote"></div>
   </main>
 
-  <!-- Marked for Markdown parsing -->
+  <footer class="container">
+    <span>© <span id="year"></span> Deep Research Hub</span>
+    <span class="sep">•</span>
+    <span id="metaNote"></span>
+  </footer>
+
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script>
-    // Configure Marked (safe-ish defaults)
-    marked.setOptions({
-      breaks: false,
-      mangle: false,
-      headerIds: true,
-      headerPrefix: "",
-      smartLists: true,
-      smartypants: true
-    });
+    marked.setOptions({ breaks:false, mangle:false, headerIds:true, headerPrefix:"", smartLists:true, smartypants:true });
+
+    const fmt = (dStr)=>{
+      if(!dStr) return "";
+      const d = new Date(dStr);
+      if(isNaN(d)) return dStr;
+      return d.toLocaleDateString(undefined, {year:"numeric", month:"short", day:"2-digit"});
+    };
 
     async function init(){
       const params = new URLSearchParams(window.location.search);
       const id = params.get("doc");
-      if(!id){ document.getElementById("content").textContent = "No doc selected."; return; }
+      const contentEl = document.getElementById("content");
+      if(!id){ contentEl.textContent = "No doc selected."; return; }
 
-      // Load manifest
       const manifest = await fetch("manifest.json", { cache: "no-store" }).then(r=>r.json());
       const entry = manifest.find(x => x.id === id);
-      if(!entry){ document.getElementById("content").textContent = "Doc not found."; return; }
+      if(!entry){ contentEl.textContent = "Doc not found."; return; }
 
       document.title = entry.title + " — Deep Research Hub";
       document.getElementById("docTitle").textContent = entry.title;
-      document.getElementById("docMeta").textContent = entry.category ? `#${entry.category}` : "";
 
-      // Fetch markdown
+      // chips: category + tags if provided
+      const chipWrap = document.getElementById("docChips");
+      chipWrap.innerHTML = "";
+      if(entry.category){
+        const c = document.createElement("span"); c.className="chip"; c.textContent="#"+entry.category; chipWrap.appendChild(c);
+      }
+      if(Array.isArray(entry.tags)){ entry.tags.forEach(t=>{ const s=document.createElement("span"); s.className="chip"; s.textContent="#"+t; chipWrap.appendChild(s); }); }
+
+      // fetch markdown
       const md = await fetch(entry.file, { cache: "no-store" }).then(r=>r.text());
-      const html = marked.parse(md);
-      const contentEl = document.getElementById("content");
-      contentEl.innerHTML = html;
+      contentEl.innerHTML = marked.parse(md);
 
-      // Add IDs to headings if missing; make them anchorable
+      // heading anchors
       Array.from(contentEl.querySelectorAll("h1, h2, h3")).forEach(h=>{
         if(!h.id){
           h.id = h.textContent.trim().toLowerCase()
-            .replace(/[^a-z0-9\\s-]/g,"")
-            .replace(/\\s+/g,"-")
+            .replace(/[^a-z0-9\s-]/g,"")
+            .replace(/\s+/g,"-")
             .replace(/-+/g,"-");
         }
-        // Optional: add a small anchor link
         const a = document.createElement("a");
         a.href = "#" + h.id;
         a.textContent = " ¶";
@@ -74,7 +85,7 @@
         h.appendChild(a);
       });
 
-      // Reading progress bar
+      // reading progress
       const progress = document.getElementById("progress");
       const onScroll = ()=>{
         const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
@@ -85,8 +96,21 @@
       document.addEventListener("scroll", onScroll, { passive:true });
       onScroll();
 
-      // Optional note (remove if you don’t want it)
-      document.getElementById("sourceNote").textContent = entry.note || "";
+      // utilities
+      document.getElementById("copyLink").addEventListener("click", async ()=>{
+        try{
+          await navigator.clipboard.writeText(location.href);
+          alert("Link copied");
+        }catch(e){ alert("Copy failed"); }
+      });
+      document.getElementById("openRaw").href = entry.file;
+
+      // footer meta
+      document.getElementById("year").textContent = new Date().getFullYear();
+      const note = [];
+      if(entry.date) note.push("Date: " + fmt(entry.date));
+      if(entry.category) note.push("Category: #" + entry.category);
+      document.getElementById("metaNote").textContent = note.join(" • ");
     }
 
     init();
