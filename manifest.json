@@ -1,18 +1,20 @@
 [
   {
-  "id": "graphite-doe-brief-2025-09",
-  "title": "U.S. Graphite — Prompt & Full Deep Research (PDF)",
-  "category": "graphite",
-  "tags": ["DOE", "anode", "critical-minerals"],
-  "date": "2025-09-24",
-  "tickers": ["NVX","NMG","GPHOF","WWR","NGPHF","SYAAF","GRFX"],
-  "file": "docs/graphite-doe-brief.md"
-}
-
-  {
     "id": "test",
     "title": "Test Deep Research Output",
     "category": "demo",
+    "date": "2025-09-24",
+    "tags": ["sample"],
+    "tickers": [],
     "file": "docs/test-deep-research.md"
+  },
+  {
+    "id": "graphite-doe-brief-2025-09",
+    "title": "U.S. Graphite — Prompt & Full Deep Research (PDF)",
+    "category": "graphite",
+    "tags": ["DOE", "anode", "critical-minerals"],
+    "date": "2025-09-24",
+    "tickers": ["NVX","NMG","GPHOF","WWR","NGPHF","SYAAF","GRFX"],
+    "file": "docs/graphite-doe-brief.md"
   }
 ]
