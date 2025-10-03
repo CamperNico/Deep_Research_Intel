@@ -12,7 +12,7 @@ This entry includes both the **Prompt** and the **Full Deep Research Response** 
 
 ### Documents
 - **Prompt (PDF):** [Open the prompt](docs/Seach-for-mineral-stocks-prompt.pdf)
-- **Full Response (PDF):** [Open the full research](docs/Top 5 Overlooked Critical Mineral Stocks for U.S. Supply Chain Independence.pdf)
+- **Full Response (PDF):** [Open the full research](docs/critical-mineral-stocks-response.pdf)
 
 ---
 
