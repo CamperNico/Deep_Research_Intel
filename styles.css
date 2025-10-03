@@ -28,6 +28,12 @@ body{
     repeating-linear-gradient(0deg, var(--bg) 0 28px, var(--grid) 28px 29px);
   background-color:var(--bg);
 }
+.logo-img {
+  height: 32px;
+  width: auto;
+  border-radius: 6px;
+  object-fit: contain;
+}
 
 /* HEADER */
 header{
