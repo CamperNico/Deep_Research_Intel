@@ -1,18 +1,20 @@
 [
   {
-    "id": "graphite-doe-prompt",
-    "title": "Prompt — Deep Research into U.S. Graphite Companies",
-    "category": "graphite",
-    "tags": ["prompt", "DOE", "critical-minerals"],
-    "date": "2025-09-23",
-    "file": "docs/ChatGPT Deep Research into US Graphite companies.pdf"
+    "id": "test",
+    "title": "Test Deep Research Output",
+    "category": "demo",
+    "date": "2025-09-24",
+    "tags": ["sample"],
+    "tickers": [],
+    "file": "docs/test-deep-research.md"
   },
   {
-    "id": "graphite-doe-response",
-    "title": "Response — U.S. Graphite Companies and DOE Support Prospects",
+    "id": "graphite-doe-brief-2025-09",
+    "title": "U.S. Graphite — Prompt & Full Deep Research (PDF)",
     "category": "graphite",
-    "tags": ["response", "DOE", "critical-minerals"],
+    "tags": ["DOE", "anode", "critical-minerals"],
     "date": "2025-09-24",
-    "file": "docs/U.S.-Exposed Graphite Companies and Prospects for DOE_US Government Support.pdf"
+    "tickers": ["NVX","NMG","GPHOF","WWR","NGPHF","SYAAF","GRFX"],
+    "file": "docs/graphite-doe-brief.md"
   }
 ]
