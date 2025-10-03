@@ -9,6 +9,16 @@
     "file": "docs/graphite-doe-brief.md"
   },
   {
+  "id": "nvx-zacks-brief-2025-09",
+  "title": "NVX — Zacks Research & ChatGPT Summary (PDF)",
+  "category": "graphite",
+  "tags": ["NVX", "Zacks", "equity-research"],
+  "date": "2025-09-04",
+  "tickers": ["NVX"],
+  "file": "docs/nvx-zacks-brief.md"
+},
+
+  {
     "id": "mineral-stocks-brief-2025-09",
     "title": "Top 5 Overlooked Critical Mineral Stocks — Prompt & Full Deep Research (PDF)",
     "category": "minerals",
