@@ -9,6 +9,15 @@
     "file": "docs/graphite-doe-brief.md"
   },
   {
+  "id": "domestic-lithium-brief-2025-09",
+  "title": "Domestic Lithium Mining Stocks — Full Deep Research (PDF)",
+  "category": "lithium",
+  "tags": ["DOE", "mining", "equities"],
+  "date": "2025-09-26",
+  "tickers": ["LAC","PLL","SLI","IONR"],
+  "file": "docs/domestic-lithium-brief.md"
+},
+  {
   "id": "nvx-zacks-brief-2025-09",
   "title": "NVX — Zacks Research & ChatGPT Summary (PDF)",
   "category": "graphite",
